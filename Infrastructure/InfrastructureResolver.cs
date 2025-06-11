@@ -1,5 +1,7 @@
+using Application.Repositories;
 using Infrastructure.IdentityServer;
 using Infrastructure.Persistence;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +21,7 @@ public static class InfrastructureResolver
             .AddInMemoryClients(Config.Clients)
             .AddDeveloperSigningCredential();
         
+        services.AddScoped<IUserRepository, UserRepository>();
         
         return services;
     }
