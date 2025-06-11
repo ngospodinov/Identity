@@ -1,0 +1,58 @@
+@page
+@model IdentityProvider.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "Account management";
+}
+
+<section class="container py-4">
+    <div class="mb-3">
+        <h1 class="h4 mb-1">Account management</h1>
+        <p class="text-muted small mb-0">View your account details and manage your identity.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h2 class="h6 mb-0">Account</h2>
+                    <span class="badge bg-secondary">Identity Provider</span>
+                </div>
+                <div class="card-body">
+                    <dl class="row gy-3 mb-0">
+                        <dt class="col-sm-4">User ID</dt>
+                        <dd class="col-sm-8 text-break">@Model.UserId</dd>
+
+                        <dt class="col-sm-4">Username</dt>
+                        <dd class="col-sm-8">@Model.UserName</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8 text-break">@Model.Email</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a class="btn btn-outline-danger" asp-page="/Account/Delete/Index">
+                    <i class="bi bi-trash"></i> Delete my account
+                </a>
+                <a class="btn btn-secondary" href="https://localhost:5000/">
+                    <i class="bi bi-box-arrow-left"></i> Back to dashboard
+                </a>
+            </div>
+
+            <div class="alert alert-info d-flex align-items-start gap-2 mt-4 mb-0">
+                <i class="bi bi-info-circle mt-1"></i>
+                <div class="small mb-0">
+                    Deleting your account removes all identity data from this Identity Provider.
+                    This action cannot be undone.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .card-header {
+        background: #f8f9fa;
+    }
+</style>

@@ -1,0 +1,116 @@
+﻿.welcome-page .logo {
+  width: 64px;
+}
+
+.icon-banner {
+  width: 32px;
+}
+
+.body-container {
+  margin-top: 60px;
+  padding-bottom: 40px;
+}
+
+.welcome-page li {
+  list-style: none;
+  padding: 4px;
+}
+
+.logged-out-page iframe {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.grants-page .card {
+  margin-top: 20px;
+  border-bottom: 1px solid lightgray;
+}
+.grants-page .card .card-title {
+  font-size: 120%;
+  font-weight: bold;
+}
+.grants-page .card .card-title img {
+  width: 100px;
+  height: 100px;
+}
+.grants-page .card label {
+  font-weight: bold;
+}
+
+.text-monospace { 
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; 
+}
+.card-header { 
+  background: #f8f9fa; 
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+.card .btn {
+  border-radius: 0.5rem;
+}
+.card:hover {
+  transform: translateY(-2px); transition: transform .12s ease-out;
+}
+.navbar-dark {
+  background: linear-gradient(180deg, #0b0f14 0%, #121821 100%);
+}
+
+.navbar-dark .navbar-brand {
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.navbar-dark .nav-link {
+  color: rgba(231,236,243,.9) !important;
+  border-radius: .5rem;
+  padding: .5rem .75rem;
+}
+
+.navbar-dark .nav-link .bi {
+  opacity: .85;
+  margin-right: .25rem;
+}
+.navbar-dark .nav-link:hover, .navbar-dark .nav-link:focus {
+  background: rgba(255,255,255,.08);
+  color: #fff !important;
+}
+.navbar-dark .nav-link.active {
+  background: rgba(110, 166, 255, .18);
+  color: #fff !important;
+  box-shadow: inset 0 0 0 1px rgba(106,166,255,.35);
+}
+.navbar .btn-manage {
+  border-radius: .6rem;
+}
+.navbar .navbar-toggler {
+  border: 1px solid rgba(255,255,255,.25);
+}
+.navbar .navbar-toggler-icon {
+  filter: invert(1) grayscale(1) brightness(1.2);
+}

@@ -1,0 +1,51 @@
+@page
+@model IdentityProvider.Pages.Account.Delete.IndexModel
+@{
+    ViewData["Title"] = "Delete account";
+    var isReauthenticated = ViewData["IsReauthenticated"] as bool? ?? false;
+    var callbackUrl = Url.Page("/Account/Delete/Index", pageHandler: "Callback");
+}
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="h5 mb-0">Delete my account</h2>
+            </div>
+            <div class="card-body">
+                <partial name="_ValidationSummary" />
+
+                @if (!isReauthenticated)
+                {
+                    <p class="mb-3">For your security, please re-authenticate before deleting your account.</p>
+
+                    <a class="btn btn-primary"
+                       asp-page="/ExternalLogin/Challenge"
+                       asp-route-scheme="Google"
+                       asp-route-returnUrl="@callbackUrl">
+                        Re-authenticate with Google
+                    </a>
+
+                    <a class="btn btn-secondary ms-2" asp-page="/Account/Manage/Index">Cancel</a>
+                }
+                else
+                {
+                    <p class="mb-3">
+                        This permanently deletes your account and ends your access. This action cannot be undone.
+                    </p>
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" name="Confirm" type="checkbox" value="true" id="confirmBox" />
+                            <label class="form-check-label" for="confirmBox">
+                                I understand this cannot be undone.
+                            </label>
+                        </div>
+                        <button class="btn btn-danger" type="submit">Delete my account</button>
+                        <a class="btn btn-secondary ms-2" asp-page="/Account/Manage/Index">Cancel</a>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
