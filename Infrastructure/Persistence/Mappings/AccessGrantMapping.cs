@@ -22,9 +22,5 @@ public class AccessGrantMapping : IEntityTypeConfiguration<AccessGrant>
         builder.HasOne(g => g.User)
             .WithMany(u => u.AccessGrants)
             .HasForeignKey(g => g.UserId);
-
-        builder.HasOne(g => g.Institution)
-            .WithMany(i => i.AccessGrants)
-            .HasForeignKey(g => g.InstitutionId);
     }
 }

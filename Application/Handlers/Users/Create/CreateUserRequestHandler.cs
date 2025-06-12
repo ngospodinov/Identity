@@ -2,7 +2,7 @@ using Application.Repositories;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.Handlers.Users;
+namespace Application.Handlers.Users.Create;
 
 public class CreateUserRequestHandler(IUserRepository userRepository) : IRequestHandler<CreateUserRequest, Guid>
 {
@@ -15,7 +15,7 @@ public class CreateUserRequestHandler(IUserRepository userRepository) : IRequest
             Email = request.Email,
         };
         
-        await userRepository.CreateUserAsync(newUser);
+        await userRepository.CreateUserAsync(newUser, cancellationToken);
         
         return newUser.Id;
     }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250611080531_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250612193040_SeedTestData")]
+    partial class SeedTestData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,14 +36,15 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("GrantedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("InstitutionId")
+                    b.Property<Guid?>("InstitutionId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -55,6 +56,16 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("access_grants", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = 0,
+                            ClientId = "test-client",
+                            GrantedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001")
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Institution", b =>
@@ -109,6 +120,26 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("user_data_items", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = 0,
+                            CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Key = "GPA",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001"),
+                            Value = "3.8"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = 1,
+                            CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Key = "IBAN",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001"),
+                            Value = "BG00TEST1234567890"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.UserEntity", b =>
@@ -133,23 +164,28 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "test@example.com",
+                            Username = "testuser"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.AccessGrant", b =>
                 {
-                    b.HasOne("Domain.Entities.Institution", "Institution")
+                    b.HasOne("Domain.Entities.Institution", null)
                         .WithMany("AccessGrants")
-                        .HasForeignKey("InstitutionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InstitutionId");
 
                     b.HasOne("Domain.Entities.UserEntity", "User")
                         .WithMany("AccessGrants")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Institution");
 
                     b.Navigation("User");
                 });

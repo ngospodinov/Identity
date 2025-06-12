@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Application.Handlers.Users;
+namespace Application.Handlers.Users.Create;
 
 public class CreateUserRequest : IRequest<Guid>
 {
