@@ -9,7 +9,7 @@ namespace Identity.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] 
+
 public class UserController(ISender sender) : ControllerBase
 {
     // [HttpGet("{id}")]
@@ -26,6 +26,7 @@ public class UserController(ISender sender) : ControllerBase
     // }
 
     [HttpPost]
+    [Authorize] 
     public async Task<ActionResult> CreateUserAsync([FromBody] CreateUserRequest request)
     {
         var userId = await sender.Send(request);
