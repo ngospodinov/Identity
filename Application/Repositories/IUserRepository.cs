@@ -7,4 +7,6 @@ public interface IUserRepository
     Task CreateUserAsync(UserEntity user, CancellationToken cancellationToken);
     
     Task<UserEntity?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
+    
+    Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken);
 }

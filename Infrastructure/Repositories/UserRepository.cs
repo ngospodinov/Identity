@@ -22,4 +22,9 @@ public class UserRepository(IdentityDbContext dbContext) : IUserRepository
             .Include(x => x.AccessGrants)
             .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
     }
+
+    public async Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Users.AnyAsync(x => x.Id == userId, cancellationToken);
+    }
 }

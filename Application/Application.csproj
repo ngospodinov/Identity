@@ -14,4 +14,8 @@
         <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Handlers\Users\DataItems\Get\GetById\" />
+    </ItemGroup>
+
 </Project>
