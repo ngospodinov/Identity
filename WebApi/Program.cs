@@ -1,4 +1,5 @@
 using Application;
+using Identity.Middleware;
 using Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 
@@ -68,6 +69,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseIdentityServer();
 app.UseAuthentication();
+app.UseMiddleware<ExceptionHandler>();
 app.UseAuthorization();
 app.MapControllers();
 

@@ -1,3 +1,4 @@
+using Application;
 using Application.Repositories;
 using Application.Services;
 using Infrastructure.IdentityServer;
@@ -26,6 +27,8 @@ public static class InfrastructureResolver
         services.AddHttpContextAccessor();
 
         services.AddScoped<ICurrentClientProvider, CurrentClientProvider>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
         services.AddScoped<IUserRepository, UserRepository>();
         
         return services;
