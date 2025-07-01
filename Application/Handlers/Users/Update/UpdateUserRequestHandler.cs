@@ -8,11 +8,11 @@ public class UpdateUserRequestHandler(IUserRepository userRepository, IUnitOfWor
 {
     public async Task Handle(UpdateUserRequest request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUserByIdAsync(request.Id, cancellationToken);
+        var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken);
 
         if (user == null)
         {
-            throw new NotFoundException($"User with id {request.Id} not found.");
+            throw new NotFoundException($"User with id {request.UserId} not found.");
         }
         
         user.Email = request.Email;
