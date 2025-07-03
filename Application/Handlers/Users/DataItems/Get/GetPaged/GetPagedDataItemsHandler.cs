@@ -1,12 +1,14 @@
+using Application.Common.Models;
 using Application.Exceptions;
+using Application.Handlers.Users.Dtos;
 using Application.Repositories;
 using MediatR;
 
 namespace Application.Handlers.Users.DataItems.Get.GetPaged;
 
-public class GetPagedDataItemsHandler(IUserRepository userRepository, IDataItemRepository dataItemRepository) : IRequestHandler<GetPagedDataItemsRequest, GetPagedDataItemsResponse>
+public class GetPagedDataItemsHandler(IUserRepository userRepository, IDataItemRepository dataItemRepository) : IRequestHandler<GetPagedDataItemsRequest, PagedResult<UserDataItemDto>>
 {
-    public async Task<GetPagedDataItemsResponse> Handle(GetPagedDataItemsRequest request,
+    public async Task<PagedResult<UserDataItemDto>> Handle(GetPagedDataItemsRequest request,
         CancellationToken cancellationToken)
     {
         var userExists = await userRepository.ExistsAsync(request.UserId, cancellationToken);
@@ -18,9 +20,9 @@ public class GetPagedDataItemsHandler(IUserRepository userRepository, IDataItemR
         
         var dataItems = await dataItemRepository.GetUserDataItemsAsync(request.UserId, request.Category, request.PageNumber, request.PageSize, cancellationToken);
 
-        return new GetPagedDataItemsResponse
+        return new PagedResult<UserDataItemDto>
         {
-            DataItems = dataItems,
+            Items = dataItems,
             TotalCount = dataItems.Count,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,

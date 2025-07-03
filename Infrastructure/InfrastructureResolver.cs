@@ -31,6 +31,7 @@ public static class InfrastructureResolver
         
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDataItemRepository, DataItemRepository>();
+        services.AddScoped<IAccessGrantRepository, AccessGrantRepository>();
         
         return services;
     }

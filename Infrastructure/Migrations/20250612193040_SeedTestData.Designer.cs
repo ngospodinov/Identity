@@ -61,7 +61,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Category = 0,
+                            Category = 1,
                             ClientId = "test-client",
                             GrantedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
@@ -125,7 +125,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Category = 0,
+                            Category = 1,
                             CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Key = "GPA",
                             UserId = new Guid("00000000-0000-0000-0000-000000000001"),
@@ -134,7 +134,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            Category = 1,
+                            Category = 2,
                             CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Key = "IBAN",
                             UserId = new Guid("00000000-0000-0000-0000-000000000001"),

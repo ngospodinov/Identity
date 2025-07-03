@@ -1,7 +1,9 @@
 using System.Net;
+using Application.Handlers.AccessGrants.Get.GetPaged;
 using Application.Handlers.Users.Create;
 using Application.Handlers.Users.DataItems.Create;
 using Application.Handlers.Users.DataItems.Delete;
+using Application.Handlers.Users.DataItems.Get.GetPaged;
 using Application.Handlers.Users.DataItems.Update;
 using Application.Handlers.Users.Get;
 using Application.Handlers.Users.Update;
@@ -42,7 +44,13 @@ public class UserController(ISender sender) : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{userId:guid}/data-item")]
+    [HttpGet("{userId:guid}/data-items")]
+    public async Task<IActionResult> GetDataItemsAsync([FromRoute] Guid userId, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
+    {
+        return Ok(await sender.Send(new GetPagedDataItemsRequest(userId, pageSize, pageNumber)));
+    }
+
+    [HttpPost("{userId:guid}/data-items")]
     public async Task<IActionResult> CreateDataItemAsync([FromRoute] Guid userId, [FromBody] CreateDataItemRequest request)
     {
         request.SetId(userId);
@@ -51,7 +59,7 @@ public class UserController(ISender sender) : ControllerBase
         return CreatedAtRoute("GetUserById", new { userId = userId }, new { dataItemId = newDataItemId });
     }
     
-    [HttpDelete("{userId:guid}/data-item/{dataItemId:int}")]
+    [HttpDelete("{userId:guid}/data-items/{dataItemId:int}")]
     public async Task<IActionResult> DeleteDataItemAsync([FromRoute] Guid userId, [FromRoute] int dataItemId)
     {
         await sender.Send(new DeleteDataItemRequest(userId, dataItemId));
@@ -59,12 +67,18 @@ public class UserController(ISender sender) : ControllerBase
         return NoContent();
     }
     
-    [HttpPut("{userId:guid}/data-item/{dataItemId:int}")]
+    [HttpPut("{userId:guid}/data-items/{dataItemId:int}")]
     public async Task<IActionResult> UpdateDataItemAsync([FromRoute] Guid userId, [FromRoute] int dataItemId, [FromBody] UpdateDataItemRequest request)
     {
         request.SetId(userId, dataItemId);
         await sender.Send(request);
         
         return NoContent();
+    }
+    
+    [HttpGet("{userId:guid}/access-grants")]
+    public async Task<IActionResult> GetAccessGrantsAsync([FromRoute] Guid userId, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
+    {
+        return Ok(await sender.Send(new GetPagedAccessGrantsRequest(userId, pageSize, pageNumber)));
     }
 }

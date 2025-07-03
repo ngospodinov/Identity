@@ -21,15 +21,15 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "access_grants",
                 columns: new[] { "Id", "Category", "ClientId", "GrantedAt", "InstitutionId", "UserId" },
-                values: new object[] { 1, 0, "test-client", new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new Guid("00000000-0000-0000-0000-000000000001") });
+                values: new object[] { 1, 1, "test-client", new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.InsertData(
                 table: "user_data_items",
                 columns: new[] { "Id", "Category", "CreatedAt", "Key", "UserId", "Value" },
                 values: new object[,]
                 {
-                    { 1, 0, new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GPA", new Guid("00000000-0000-0000-0000-000000000001"), "3.8" },
-                    { 2, 1, new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "IBAN", new Guid("00000000-0000-0000-0000-000000000001"), "BG00TEST1234567890" }
+                    { 1, 1, new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GPA", new Guid("00000000-0000-0000-0000-000000000001"), "3.8" },
+                    { 2, 2, new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "IBAN", new Guid("00000000-0000-0000-0000-000000000001"), "BG00TEST1234567890" }
                 });
         }
 

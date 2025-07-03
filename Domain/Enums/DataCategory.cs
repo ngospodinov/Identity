@@ -2,7 +2,7 @@ namespace Domain.Enums;
 
 public enum DataCategory
 {
-    Academic,
+    Academic = 1,
     Financial,
     Legal,
     Personal,
