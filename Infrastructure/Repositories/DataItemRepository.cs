@@ -26,4 +26,9 @@ public class DataItemRepository(IdentityDbContext dbContext) : IDataItemReposito
 
        return items;
     }
+
+    public async Task<bool> ExistsAsync(int dataItemId, CancellationToken cancellationToken)
+    {
+        return await dbContext.UserDataItems.AnyAsync(x => x.Id == dataItemId, cancellationToken);
+    }
 }

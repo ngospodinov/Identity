@@ -20,7 +20,9 @@ public class AccessRequest
     
     public UserDataItem? RequestedItem { get; set; } = null!;
     
-    public DateTime RequestedAt { get; set; }
+    public DateTime RequestedAt { get; set; } 
     
     public DateTime ReviewedAt { get; set; }
+
+    public RequestStatus Status { get; set; } = RequestStatus.Pending;
 }

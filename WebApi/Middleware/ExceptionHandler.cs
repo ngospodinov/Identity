@@ -24,6 +24,7 @@ public class ExceptionHandler(RequestDelegate next, ILogger<ExceptionHandler> lo
                 NotFoundException => StatusCodes.Status404NotFound,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
                 ArgumentException => StatusCodes.Status400BadRequest,
+                BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
             

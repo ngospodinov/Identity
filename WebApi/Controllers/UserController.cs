@@ -2,6 +2,7 @@ using System.Net;
 using Application.Handlers.AccessGrants.Create;
 using Application.Handlers.AccessGrants.Delete;
 using Application.Handlers.AccessGrants.Get.GetPaged;
+using Application.Handlers.AccessRequests.Get.GetById;
 using Application.Handlers.Users.Create;
 using Application.Handlers.Users.DataItems.Create;
 using Application.Handlers.Users.DataItems.Delete;
@@ -99,5 +100,11 @@ public class UserController(ISender sender) : ControllerBase
     {
         await sender.Send(new RevokeAccessGrantRequest(userId, accessGrantId));
         return NoContent();
+    }
+
+    [HttpGet("{userId:guid}/access-requests/{accessRequestId:int}", Name = "GetAccessRequestForUser")]
+    public async Task<IActionResult> GetAccessRequestForUser([FromRoute] Guid userId, [FromRoute] int accessRequestId)
+    {
+        return Ok(await sender.Send(new GetAccessRequestByIdRequest(userId, accessRequestId)));
     }
 }

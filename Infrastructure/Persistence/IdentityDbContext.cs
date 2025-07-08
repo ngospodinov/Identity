@@ -17,6 +17,8 @@ public class IdentityDbContext : DbContext
     public DbSet<Institution> Institutions { get; set; }
     
     public DbSet<AccessGrant> AccessGrants { get; set; }
+    
+    public DbSet<AccessRequest> AccessRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

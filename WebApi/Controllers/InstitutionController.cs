@@ -1,6 +1,8 @@
 using Application.Handlers.Institutions.Create;
+using Application.Handlers.Institutions.Delete;
 using Application.Handlers.Institutions.Get.GetById;
 using Application.Handlers.Institutions.Get.GetPaged;
+using Application.Handlers.Institutions.SubmitAccessRequest;
 using Application.Handlers.Institutions.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,18 +33,35 @@ public class InstitutionController(ISender sender) : ControllerBase
     }
 
     [HttpPost("{institutionId:guid}")]
-    public async Task<IActionResult> CreateInstitutionAsync([FromRoute] Guid institutionId,
+    public async Task<IActionResult> UpdateInstitutionAsync([FromRoute] Guid institutionId,
         [FromBody] UpdateInstitutionRequest request)
     {
         request.SetId(institutionId);
         await sender.Send(request);
-        
+
         return NoContent();
     }
 
     [HttpDelete("{institutionId:guid}")]
     public async Task<IActionResult> DeleteInstitutionAsync([FromRoute] Guid institutionId)
     {
-            
+        await sender.Send(new DeleteInstitutionRequest(institutionId));
+        
+        return NoContent();
+    }
+
+    [HttpPost("{institutionId:guid}/access-requests")]
+    public async Task<IActionResult> SubmitAccessRequest([FromRoute] Guid institutionId,
+        [FromBody] SubmitAccessRequest request)
+    {
+        request.SetId(institutionId);
+        var accessRequestDto = await sender.Send(request);
+        
+        var location = Url.Action("GetAccessRequestForUser", "User", new {
+            userId = accessRequestDto.UserId,
+            requestId = accessRequestDto.Id
+        });
+        
+        return Created(location!, accessRequestDto);
     }
 }
