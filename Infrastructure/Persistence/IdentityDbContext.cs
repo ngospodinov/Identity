@@ -10,7 +10,7 @@ public class IdentityDbContext : DbContext
     {
     }
 
-    public DbSet<UserEntity> Users { get; set; }
+    public DbSet<User> Users { get; set; }
     
     public DbSet<UserDataItem> UserDataItems { get; set; }
     
@@ -24,14 +24,23 @@ public class IdentityDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         
         var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var institutionId = Guid.Parse("00000000-0000-0000-0000-000000000002");
         var date = new DateTime(2025, 03, 01, 0, 0, 0, DateTimeKind.Utc);
         
-        modelBuilder.Entity<UserEntity>().HasData(new UserEntity
+        modelBuilder.Entity<User>().HasData(new User
         {
             Id = userId,
             Username = "testuser",
             Email = "test@example.com",
             CreatedAt = date
+        });
+
+        modelBuilder.Entity<Institution>().HasData(new Institution
+        {
+            Id = institutionId,
+            Name = "Test Institution",
+            ContactEmail = "test@example.com",
+            ClientId = "test-client",
         });
 
         modelBuilder.Entity<UserDataItem>().HasData(
@@ -59,9 +68,10 @@ public class IdentityDbContext : DbContext
         {
             Id = 1,
             UserId = userId,
+            InstitutionId = institutionId,
             ClientId = "test-client", 
             Category = Domain.Enums.DataCategory.Academic,
-            GrantedAt = date
+            GrantedAt = date,
         });
     }
 }

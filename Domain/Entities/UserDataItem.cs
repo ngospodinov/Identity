@@ -8,7 +8,7 @@ public class UserDataItem
     
     public Guid UserId { get; set; }
     
-    public UserEntity User { get; set; } = null!;
+    public User User { get; set; } = null!;
 
     public string Key { get; set; } = null!;
     
@@ -17,4 +17,6 @@ public class UserDataItem
     public DataCategory Category { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    public DateTime? DeletedAt { get; set; }
 }

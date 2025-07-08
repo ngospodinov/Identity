@@ -7,7 +7,7 @@ namespace Infrastructure.Repositories;
 
 public class UserRepository(IdentityDbContext dbContext) : IUserRepository
 {
-    public async Task CreateUserAsync(UserEntity user, CancellationToken cancellationToken)
+    public async Task CreateUserAsync(User user, CancellationToken cancellationToken)
     {
         user.Id = Guid.NewGuid();
         dbContext.Users.Add(user);
@@ -15,7 +15,7 @@ public class UserRepository(IdentityDbContext dbContext) : IUserRepository
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<UserEntity?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await dbContext.Users
             .Include(x => x.DataItems)

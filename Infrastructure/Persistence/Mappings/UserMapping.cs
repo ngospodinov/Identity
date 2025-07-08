@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Mappings;
 
-public class UserMapping : IEntityTypeConfiguration<UserEntity>
+public class UserMapping : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<UserEntity> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("users");
         

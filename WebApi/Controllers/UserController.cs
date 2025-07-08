@@ -1,4 +1,6 @@
 using System.Net;
+using Application.Handlers.AccessGrants.Create;
+using Application.Handlers.AccessGrants.Delete;
 using Application.Handlers.AccessGrants.Get.GetPaged;
 using Application.Handlers.Users.Create;
 using Application.Handlers.Users.DataItems.Create;
@@ -19,7 +21,7 @@ namespace Identity.Controllers;
 public class UserController(ISender sender) : ControllerBase
 {
     [HttpGet("{userId:guid}", Name="GetUserById")]
-    public async Task<IActionResult> GetUserAsync([FromRoute] Guid userId)
+    public async Task<IActionResult> GetUserDataAsync([FromRoute] Guid userId)
     {
         var result = await sender.Send(new GetUserRequest(userId));
 
@@ -76,9 +78,26 @@ public class UserController(ISender sender) : ControllerBase
         return NoContent();
     }
     
-    [HttpGet("{userId:guid}/access-grants")]
+    [HttpGet("{userId:guid}/access", Name = "GetUserAccessGrants")]
     public async Task<IActionResult> GetAccessGrantsAsync([FromRoute] Guid userId, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
     {
         return Ok(await sender.Send(new GetPagedAccessGrantsRequest(userId, pageSize, pageNumber)));
+    }
+
+    [HttpPost("{userId:guid}/access")]
+    public async Task<IActionResult> CreateAccessGrant([FromRoute] Guid userId,
+        [FromBody] CreateAccessGrantRequest request)
+    {
+        request.SetId(userId);
+        var accessGrantId = await sender.Send(request);
+        
+        return CreatedAtRoute("GetUserAccessGrants", new { userId }, new { accessGrantId });
+    }
+
+    [HttpDelete("{userId:guid}/access/{accessGrantId:int}")]
+    public async Task<IActionResult> RevokeAccessGrant([FromRoute] Guid userId, [FromRoute] int accessGrantId)
+    {
+        await sender.Send(new RevokeAccessGrantRequest(userId, accessGrantId));
+        return NoContent();
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250612193040_SeedTestData")]
-    partial class SeedTestData
+    [Migration("20250707115338_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,8 +43,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("GrantedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("InstitutionId")
+                    b.Property<Guid>("InstitutionId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -53,7 +56,8 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("InstitutionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "Category")
+                        .IsUnique();
 
                     b.ToTable("access_grants", (string)null);
 
@@ -64,8 +68,46 @@ namespace Infrastructure.Migrations
                             Category = 1,
                             ClientId = "test-client",
                             GrantedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            InstitutionId = new Guid("00000000-0000-0000-0000-000000000002"),
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
+                });
+
+            modelBuilder.Entity("Domain.Entities.AccessRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("InstitutionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RequestedCategory")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RequestedItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId");
+
+                    b.HasIndex("RequestedItemId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("access_requests", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Institution", b =>
@@ -73,6 +115,10 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("ContactEmail")
                         .IsRequired()
@@ -86,7 +132,52 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
                     b.ToTable("institutions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
+                            ClientId = "test-client",
+                            ContactEmail = "test@example.com",
+                            Name = "Test Institution"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "test@example.com",
+                            Username = "testuser"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.UserDataItem", b =>
@@ -101,6 +192,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Key")
@@ -142,57 +236,54 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.UserEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("users", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "test@example.com",
-                            Username = "testuser"
-                        });
-                });
-
             modelBuilder.Entity("Domain.Entities.AccessGrant", b =>
                 {
-                    b.HasOne("Domain.Entities.Institution", null)
+                    b.HasOne("Domain.Entities.Institution", "Institution")
                         .WithMany("AccessGrants")
-                        .HasForeignKey("InstitutionId");
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Domain.Entities.UserEntity", "User")
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("AccessGrants")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Institution");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.AccessRequest", b =>
+                {
+                    b.HasOne("Domain.Entities.Institution", "Institution")
+                        .WithMany("AccessRequests")
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.UserDataItem", "RequestedItem")
+                        .WithMany()
+                        .HasForeignKey("RequestedItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("AccessRequests")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Institution");
+
+                    b.Navigation("RequestedItem");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserDataItem", b =>
                 {
-                    b.HasOne("Domain.Entities.UserEntity", "User")
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("DataItems")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -204,11 +295,15 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Institution", b =>
                 {
                     b.Navigation("AccessGrants");
+
+                    b.Navigation("AccessRequests");
                 });
 
-            modelBuilder.Entity("Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("AccessGrants");
+
+                    b.Navigation("AccessRequests");
 
                     b.Navigation("DataItems");
                 });

@@ -1,6 +1,6 @@
 namespace Domain.Entities;
 
-public class UserEntity
+public class User
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
@@ -13,4 +13,6 @@ public class UserEntity
     public ICollection<UserDataItem> DataItems { get; set; } = [];
     
     public ICollection<AccessGrant> AccessGrants { get; set; } = [];
+    
+    public ICollection<AccessRequest> AccessRequests { get; set; } = [];
 }

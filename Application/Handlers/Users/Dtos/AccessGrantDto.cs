@@ -6,7 +6,7 @@ public class AccessGrantDto
 {
     public int Id { get; set; }
     
-    public string ClientId { get; set; } = null!; 
+    public Guid InstitutionId { get; set; }  
 
     public DataCategory Category { get; set; }
 

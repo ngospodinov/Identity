@@ -8,7 +8,7 @@ public class CreateUserRequestHandler(IUserRepository userRepository) : IRequest
 {
     public async Task<Guid> Handle(CreateUserRequest request, CancellationToken cancellationToken)
     {
-        var newUser = new UserEntity()
+        var newUser = new User()
         {
             Id = Guid.NewGuid(),
             Username = request.Username,

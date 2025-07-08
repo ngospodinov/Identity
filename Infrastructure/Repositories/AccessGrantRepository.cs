@@ -1,5 +1,6 @@
 using Application.Handlers.Users.Dtos;
 using Application.Repositories;
+using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +19,17 @@ public class AccessGrantRepository(IdentityDbContext dbContext) : IAccessGrantRe
             .Select(x => new AccessGrantDto
             {
                 Id = x.Id,
-                ClientId = x.ClientId, 
+                InstitutionId = x.InstitutionId, 
                 Category = x.Category,
                 GrantedAt = x.GrantedAt,
             })
             .ToListAsync(cancellationToken);
         
         return accessGrants;
+    }
+
+    public async Task<AccessGrant?> GetAccessGrantByUserIdAsync(Guid userId, int accessGrantId, CancellationToken cancellationToken)
+    {
+        return await dbContext.AccessGrants.SingleOrDefaultAsync(x => x.Id == accessGrantId && x.UserId == userId, cancellationToken);
     }
 }
