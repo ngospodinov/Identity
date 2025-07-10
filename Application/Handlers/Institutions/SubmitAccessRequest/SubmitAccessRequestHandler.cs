@@ -26,6 +26,7 @@ public class SubmitAccessRequestHandler(IUserRepository userRepository, IInstitu
         
         return new AccessRequestDto()
         {
+            Id = accessRequest.Id,
             InstitutionId = accessRequest.InstitutionId,
             UserId = accessRequest.UserId,
             RequestedItemId = accessRequest.RequestedItemId,

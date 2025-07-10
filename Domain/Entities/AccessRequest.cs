@@ -18,7 +18,7 @@ public class AccessRequest
     
     public int? RequestedItemId { get; set; }
     
-    public UserDataItem? RequestedItem { get; set; } = null!;
+    public UserDataItem? RequestedItem { get; set; } 
     
     public DateTime RequestedAt { get; set; } 
     

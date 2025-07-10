@@ -4,9 +4,9 @@ namespace Application.Handlers.Users.DataItems.Update;
 
 public class UpdateDataItemRequest : IRequest<int>
 {
-    public Guid UserId { get; set; }
+    public Guid UserId { get; private set; }
     
-    public int DataItemId { get; set; }
+    public int DataItemId { get; private set; }
     
     public string Value { get; set;  }
 

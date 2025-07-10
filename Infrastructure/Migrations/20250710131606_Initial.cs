@@ -49,9 +49,9 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClientId = table.Column<string>(type: "text", nullable: false),
                     InstitutionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Category = table.Column<int>(type: "integer", nullable: false),
+                    RequestedItemId = table.Column<int>(type: "integer", nullable: true),
                     GrantedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -107,7 +107,8 @@ namespace Infrastructure.Migrations
                     RequestedCategory = table.Column<int>(type: "integer", nullable: true),
                     RequestedItemId = table.Column<int>(type: "integer", nullable: true),
                     RequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,8 +145,8 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "access_grants",
-                columns: new[] { "Id", "Category", "ClientId", "GrantedAt", "InstitutionId", "RevokedAt", "UserId" },
-                values: new object[] { 1, 1, "test-client", new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000002"), null, new Guid("00000000-0000-0000-0000-000000000001") });
+                columns: new[] { "Id", "Category", "GrantedAt", "InstitutionId", "RequestedItemId", "RevokedAt", "UserId" },
+                values: new object[] { 1, 1, new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000002"), null, null, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.InsertData(
                 table: "user_data_items",
@@ -162,9 +163,9 @@ namespace Infrastructure.Migrations
                 column: "InstitutionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_access_grants_UserId_Category",
+                name: "IX_access_grants_UserId_InstitutionId_Category_RequestedItemId~",
                 table: "access_grants",
-                columns: new[] { "UserId", "Category" },
+                columns: new[] { "UserId", "InstitutionId", "Category", "RequestedItemId", "RevokedAt" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

@@ -8,7 +8,9 @@ public class AccessGrantDto
     
     public Guid InstitutionId { get; set; }  
 
-    public DataCategory Category { get; set; }
+    public DataCategory? Category { get; set; }
+    
+    public int? RequestedItemId { get; set; }
 
     public DateTime GrantedAt { get; set; } = DateTime.UtcNow;
 }

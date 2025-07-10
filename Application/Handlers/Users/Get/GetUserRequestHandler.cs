@@ -22,7 +22,7 @@ public class GetUserRequestHandler(IUserRepository userRepository, ICurrentClien
         }
         
         var allowedCategories = user.AccessGrants
-            .Where(x => x.ClientId == currentClient)
+            .Where(x => x.Institution.ClientId == currentClient)
             .Select(x=> x.Category)
             .ToHashSet();
         

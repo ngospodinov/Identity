@@ -71,7 +71,6 @@ public class IdentityDbContext : DbContext
             Id = 1,
             UserId = userId,
             InstitutionId = institutionId,
-            ClientId = "test-client", 
             Category = Domain.Enums.DataCategory.Academic,
             GrantedAt = date,
         });

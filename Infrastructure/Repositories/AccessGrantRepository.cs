@@ -32,4 +32,35 @@ public class AccessGrantRepository(IdentityDbContext dbContext) : IAccessGrantRe
     {
         return await dbContext.AccessGrants.SingleOrDefaultAsync(x => x.Id == accessGrantId && x.UserId == userId, cancellationToken);
     }
+
+    public async Task CreateAccessGrantAsync(AccessGrant accessGrant, CancellationToken cancellationToken)
+    {
+        await dbContext.AccessGrants.AddAsync(accessGrant, cancellationToken);
+    }
+
+    public async Task<bool> ExistsAsync(Guid userId, Guid institutionId, DataCategory? category, int? requestedItemId,
+        CancellationToken cancellationToken)
+    {
+        if (category.HasValue)
+        {
+            return await dbContext.AccessGrants.AnyAsync(x =>
+                    x.UserId == userId &&
+                    x.InstitutionId == institutionId &&
+                    x.Category == category.Value &&
+                    x.RevokedAt == null,
+                cancellationToken);
+        }
+
+        if (requestedItemId.HasValue)
+        {
+            return await dbContext.AccessGrants.AnyAsync(x =>
+                    x.UserId == userId &&
+                    x.InstitutionId == institutionId &&
+                    x.RequestedItemId == requestedItemId.Value &&
+                    x.RevokedAt == null,
+                cancellationToken);
+        }
+
+        return false;
+    }
 }

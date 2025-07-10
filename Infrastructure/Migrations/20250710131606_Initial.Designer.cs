@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250707115338_Initial")]
+    [Migration("20250710131606_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,15 +36,14 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("GrantedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("InstitutionId")
                         .HasColumnType("uuid");
+
+                    b.Property<int?>("RequestedItemId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
@@ -56,7 +55,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("InstitutionId");
 
-                    b.HasIndex("UserId", "Category")
+                    b.HasIndex("UserId", "InstitutionId", "Category", "RequestedItemId", "RevokedAt")
                         .IsUnique();
 
                     b.ToTable("access_grants", (string)null);
@@ -66,7 +65,6 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             Category = 1,
-                            ClientId = "test-client",
                             GrantedAt = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InstitutionId = new Guid("00000000-0000-0000-0000-000000000002"),
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
@@ -95,6 +93,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("ReviewedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

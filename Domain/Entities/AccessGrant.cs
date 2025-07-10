@@ -10,14 +10,14 @@ public class AccessGrant
     
     public User User { get; set; } = null!;
     
-    public string ClientId { get; set; } = null!;
-
     public Guid InstitutionId { get; set; } 
     
     public Institution Institution { get; set; } = null!;
 
-    public DataCategory Category { get; set; }
-
+    public DataCategory? Category { get; set; }
+    
+    public int? RequestedItemId { get; set; } 
+    
     public DateTime GrantedAt { get; set; } = DateTime.UtcNow;
     
     public DateTime? RevokedAt { get; set; } 

@@ -7,9 +7,11 @@ public class CreateAccessGrantRequest() : IRequest<int>
 {
     public Guid UserId { get; private set; }
     
-    public string ClientId { get; set; } = null!; 
+    public Guid InstitutionId { get; private set; }
 
-    public DataCategory Category { get; set; }
+    public DataCategory? Category { get; set; }
+    
+    public int? DataItemId { get; set; }
 
     public DateTime GrantedAt { get; set; } = DateTime.UtcNow;
 

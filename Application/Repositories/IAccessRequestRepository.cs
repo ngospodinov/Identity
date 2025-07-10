@@ -10,4 +10,9 @@ public interface IAccessRequestRepository
     Task<bool> ExistsAsync(int id, CancellationToken cancellationToken);
 
     Task<AccessRequestDto?> GetByIdAsync(int id, CancellationToken cancellationToken);
+
+    Task<AccessRequest?> GetEntityAsync(int id, CancellationToken cancellationToken);
+    
+    Task<List<AccessRequestDto>> GetAccessRequestsAsync(Guid userId, int pageNumber, int pageSize, Guid? institutionId,
+        CancellationToken cancellationToken);
 }

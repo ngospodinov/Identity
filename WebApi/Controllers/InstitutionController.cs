@@ -13,26 +13,26 @@ namespace Identity.Controllers;
 [Route("api/[controller]")]
 public class InstitutionController(ISender sender) : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> CreateInstitutionAsync([FromBody] CreateInstitutionRequest request)
-    {
-        var id = await sender.Send(request);
-        return CreatedAtRoute(nameof(GetInstitutionByIdAsync), new { id }, null);
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetInstitutionsAsync([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
     {
         return Ok(await sender.Send(new GetPagedInstitutionsRequest(pageSize, pageNumber)));
     }
 
-    [HttpGet("{institutionId:guid}")]
+    [HttpGet("{institutionId:guid}", Name = "GetInstitutionByIdAsync")]
     public async Task<IActionResult> GetInstitutionByIdAsync([FromRoute] Guid institutionId)
     {
         return Ok(await sender.Send(new GetInstitutionRequest(institutionId)));
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateInstitutionAsync([FromBody] CreateInstitutionRequest request)
+    {
+        var institutionId = await sender.Send(request);
+        return CreatedAtRoute("GetInstitutionByIdAsync", new { institutionId }, null);
+    }
 
-    [HttpPost("{institutionId:guid}")]
+    [HttpPut("{institutionId:guid}")]
     public async Task<IActionResult> UpdateInstitutionAsync([FromRoute] Guid institutionId,
         [FromBody] UpdateInstitutionRequest request)
     {

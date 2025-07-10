@@ -1,6 +1,7 @@
 using Application;
 using Application.Repositories;
 using Application.Services;
+using Domain.Entities;
 using Infrastructure.IdentityServer;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -26,12 +27,16 @@ public static class InfrastructureResolver
         
         services.AddHttpContextAccessor();
 
-        services.AddScoped<ICurrentClientProvider, CurrentClientProvider>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDataItemRepository, DataItemRepository>();
+        services.AddScoped<IAccessRequestRepository, AccessRequestRepository>();
         services.AddScoped<IAccessGrantRepository, AccessGrantRepository>();
+        services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        
+        services.AddScoped<ICurrentClientProvider, CurrentClientProvider>();
+
         
         return services;
     }

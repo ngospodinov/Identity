@@ -33,6 +33,6 @@ public class AccessGrantMapping : IEntityTypeConfiguration<AccessGrant>
             .HasForeignKey(g => g.InstitutionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(g => new { g.UserId, g.Category }).IsUnique();
+        builder.HasIndex(g => new { g.UserId, g.InstitutionId, g.Category, g.RequestedItemId, g.RevokedAt }).IsUnique();
     }
 }

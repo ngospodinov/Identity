@@ -38,6 +38,13 @@ public class InstitutionRepository(IdentityDbContext dbContext) : IInstitutionRe
             .Include(x => x.AccessGrants)
             .FirstOrDefaultAsync(x => x.Id == institutionId, cancellationToken);
     }
+
+    public async Task<Guid?> GetInstitutionIdByClientAsync(string clientId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Institutions.Where(x => x.ClientId == clientId)
+            .Select(x => (Guid?)x.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
     
     public async Task<bool> ExistsAsync(Guid institutionId, CancellationToken cancellationToken)
     {

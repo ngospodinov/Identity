@@ -3,6 +3,8 @@ using Application.Handlers.AccessGrants.Create;
 using Application.Handlers.AccessGrants.Delete;
 using Application.Handlers.AccessGrants.Get.GetPaged;
 using Application.Handlers.AccessRequests.Get.GetById;
+using Application.Handlers.AccessRequests.Get.GetPaged;
+using Application.Handlers.AccessRequests.Review;
 using Application.Handlers.Users.Create;
 using Application.Handlers.Users.DataItems.Create;
 using Application.Handlers.Users.DataItems.Delete;
@@ -79,13 +81,13 @@ public class UserController(ISender sender) : ControllerBase
         return NoContent();
     }
     
-    [HttpGet("{userId:guid}/access", Name = "GetUserAccessGrants")]
+    [HttpGet("{userId:guid}/access-grants", Name = "GetUserAccessGrants")]
     public async Task<IActionResult> GetAccessGrantsAsync([FromRoute] Guid userId, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
     {
         return Ok(await sender.Send(new GetPagedAccessGrantsRequest(userId, pageSize, pageNumber)));
     }
 
-    [HttpPost("{userId:guid}/access")]
+    [HttpPost("{userId:guid}/access-grants")]
     public async Task<IActionResult> CreateAccessGrant([FromRoute] Guid userId,
         [FromBody] CreateAccessGrantRequest request)
     {
@@ -95,7 +97,7 @@ public class UserController(ISender sender) : ControllerBase
         return CreatedAtRoute("GetUserAccessGrants", new { userId }, new { accessGrantId });
     }
 
-    [HttpDelete("{userId:guid}/access/{accessGrantId:int}")]
+    [HttpDelete("{userId:guid}/access-grants/{accessGrantId:int}")]
     public async Task<IActionResult> RevokeAccessGrant([FromRoute] Guid userId, [FromRoute] int accessGrantId)
     {
         await sender.Send(new RevokeAccessGrantRequest(userId, accessGrantId));
@@ -106,5 +108,21 @@ public class UserController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetAccessRequestForUser([FromRoute] Guid userId, [FromRoute] int accessRequestId)
     {
         return Ok(await sender.Send(new GetAccessRequestByIdRequest(userId, accessRequestId)));
+    }
+
+    [HttpGet("{userId:guid}/access-requests")]
+    public async Task<IActionResult> GetAccessRequests([FromRoute] Guid userId, [FromQuery] Guid institutionId, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
+    {
+        return Ok(await sender.Send(new GetPagedAccessRequest(userId, institutionId, pageSize, pageNumber)));
+    }
+
+    [HttpPut("{userId:guid}/access-requests/{accessRequestId:int}")]
+    public async Task<IActionResult> ReviewAccessRequest([FromRoute] Guid userId, [FromRoute] int accessRequestId,
+        [FromBody] ReviewAccessRequest request)
+    {
+        request.SetId(accessRequestId, userId);
+        await sender.Send(request);
+        
+        return NoContent();
     }
 }

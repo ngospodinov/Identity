@@ -33,4 +33,28 @@ public class AccessRequestRepository(IdentityDbContext dbContext) : IAccessReque
             })
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<AccessRequest?> GetEntityAsync(int id, CancellationToken cancellationToken)
+    {
+        return await dbContext.AccessRequests.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+    
+    public Task<List<AccessRequestDto>> GetAccessRequestsAsync(Guid userId, int pageNumber, int pageSize, Guid? institutionId, CancellationToken cancellationToken)
+    {
+        var query = dbContext.AccessRequests.Where(x => x.UserId == userId && (institutionId == null || x.InstitutionId == institutionId.Value));
+        
+        var accessRequests = query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new AccessRequestDto()
+            {
+                Id = x.Id,
+                InstitutionId = x.InstitutionId, 
+                RequestedCategory = x.RequestedCategory,
+                RequestedItemId = x.RequestedItemId,
+            })
+            .ToListAsync(cancellationToken);
+        
+        return accessRequests;
+    }
 }
