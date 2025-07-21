@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h3 mb-1">Dashboard</h1>
+            <p class="text-muted mb-0">Quick links to manage your data and permissions.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-person-badge fs-3 me-2"></i>
+                        <h2 class="h5 mb-0">Names</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">View and manage the names saved for each category.</p>
+                    <a class="btn btn-primary mt-auto" href="/Names/List">Open Names</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-collection fs-3 me-2"></i>
+                        <h2 class="h5 mb-0">My Data</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">Browse your data items by category. Add, edit, or remove items.</p>
+                    <a class="btn btn-primary mt-auto" href="/MyData/List">Open My Data</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-inboxes fs-3 me-2"></i>
+                        <h2 class="h5 mb-0">Access Requests</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">See incoming requests you’ve reviewed or need to review.</p>
+                    <a class="btn btn-primary mt-auto" href="/AccessRequests/List">Open Access Requests</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-person-plus fs-3 me-2"></i>  @* note: lowercase "person-plus" *@
+                        <h2 class="h5 mb-0">Request Access</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">Browse users and request access to specific categories.</p>
+                    <a class="btn btn-primary mt-auto" href="/RequestAccess/List">Open Request Access</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-shield-check fs-3 me-2"></i>
+                        <h2 class="h5 mb-0">Access Grants</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">Review and revoke access you’ve granted to others.</p>
+                    <a class="btn btn-primary mt-auto" href="/AccessGrants/List">Open Access Grants</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-people fs-3 me-2"></i>
+                        <h2 class="h5 mb-0">Data</h2>
+                    </div>
+                    <p class="text-muted flex-grow-1">See users who granted you access and view the data you can see.</p>
+                    <a class="btn btn-primary mt-auto" href="/Data/List">Open Data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -18,6 +18,15 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     
+    public DbSet<UserDataItem> UserDataItems { get; set; }
+    
+    public DbSet<AccessGrant> AccessGrants { get; set; }
+    
+    public DbSet<AccessRequest> AccessRequests { get; set; }
+    
+    public DbSet<ProcessedEvent> ProcessedEvents { get; set; }
+    
+    public DbSet<Name> Names { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

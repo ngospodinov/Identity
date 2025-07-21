@@ -38,6 +38,10 @@ public static class InfrastructureResolver
             "true",
             StringComparison.OrdinalIgnoreCase);
         
+        if (!isEf)
+        {
+            services.AddHostedService<UserEventsConsumer>();
+        }
       
         return services;
     }
