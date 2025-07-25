@@ -1,0 +1,78 @@
+@using IdentityProjectUI.Models
+@model IdentityProjectUI.Models.PagedResult<IdentityProjectUI.Models.DataItemDto>
+@{
+    ViewData["Title"] = "My Data";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h4 mb-1">My Data</h1>
+            <p class="text-muted mb-0">Browse and manage your saved data items by category.</p>
+        </div>
+        <div class="d-flex gap-1">
+            @await Html.PartialAsync("_PageSizeSelector", new PagerModel {
+                BasePath = "/MyData/List",
+                PageSize = Model.PageSize,
+                ItemsLabel = "Items",
+            })
+            <a class="btn btn-secondary" href="/MyData/Add">Add new entry</a>
+        </div>
+    </div>
+
+    @if (Model.Items is { Count: > 0 })
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th class="text-muted small">Id</th>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Category</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="text-muted small">@item.Id</td>
+                        <td>@item.Key</td>
+                        <td>@item.Value</td>
+                        <td><span class="badge bg-secondary">@item.Category</span></td>
+                        <td class="text-end">
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-sm btn-outline-primary" href="/MyData/Edit/@item.Id">Edit</a>
+                                <form action="/MyData/Delete/@item.Id" method="post" class="ms-1" onsubmit="return confirm('Delete this data item?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-3">
+            @await Html.PartialAsync("_Pager", new PagerModel {
+                BasePath = "/MyData/List",
+                PageNumber = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalCount = Model.TotalCount
+            })
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5 mb-2">No data items yet</h2>
+                <p class="text-muted mb-4">Add your first data item to get started.</p>
+                <a class="btn btn-primary" href="/MyData/Add">Add new entry</a>
+            </div>
+        </div>
+    }
+</section>
