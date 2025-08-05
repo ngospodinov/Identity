@@ -1,0 +1,268 @@
+@model PagedResult<AccessRequestDto>
+@{
+    ViewData["Title"] = "Access Requests";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h4 mb-1">Access Requests</h1>
+            <p class="text-muted mb-0">Review and respond to requests for access to your data.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            @await Html.PartialAsync("_PageSizeSelector", new PagerModel {
+                BasePath = "/AccessRequests/List",
+                PageSize = Model.PageSize,
+                ItemsLabel = "Items",
+            })
+        </div>
+    </div>
+
+    @if (Model.Items is { Count: > 0 })
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th hidden>Id</th>
+                    <th>Requester Id</th>
+                    <th>Email</th>
+                    <th>User name</th>
+                    <th>Requested Category</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var ar in Model.Items)
+                {
+                    <tr>
+                        <td hidden>@ar.Id</td>
+                        <td class="text-muted small">@ar.RequesterUserId</td>
+                        <td>@ar.RequesterEmail</td>
+                        <td>@ar.RequesterUserName</td>
+                        <td><span class="badge bg-secondary">@ar.RequestedCategory</span></td>
+                        <td>
+                            @if (string.Equals(ar.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                            else if (string.Equals(ar.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                            else if (string.Equals(ar.Status, "Denied", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger">Denied</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@ar.Status</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (string.Equals(ar.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <form id="ar-@ar.Id" method="post" class="d-none">
+                                    @Html.AntiForgeryToken()
+                                </form>
+
+                                <div class="btn-group" role="group" aria-label="Actions">
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-success"
+                                            form="ar-@ar.Id"
+                                            formaction="/AccessRequests/Accept/@ar.Id">
+                                        Quick Approve
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary btn-exclude"
+                                            data-request-id="@ar.Id"
+                                            data-category="@ar.RequestedCategory">
+                                        Exclude Items
+                                    </button>
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            form="ar-@ar.Id"
+                                            formaction="/AccessRequests/Deny/@ar.Id">
+                                        Deny
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No actions</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-3">
+            @await Html.PartialAsync("_Pager", new PagerModel {
+                BasePath = "/AccessRequests/List",
+                PageNumber = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalCount = Model.TotalCount
+            })
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5 mb-2">No access requests</h2>
+                <p class="text-muted mb-4">You don’t have any requests to review at the moment.</p>
+            </div>
+        </div>
+    }
+</section>
+
+<div class="modal fade" id="excludeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="excludeForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Exclude items</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="excludeRequestId" />
+
+                    <div id="itemsEmpty" class="text-muted d-none">No items defined for this category.</div>
+
+                    <div id="itemsToolbar" class="d-flex justify-content-between align-items-center mb-2 d-none">
+                        <small class="text-muted">
+                            Toggle items to <strong>exclude</strong> from this approval.
+                        </small>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Bulk">
+                            <button type="button" id="btnExcludeNone" class="btn btn-outline-secondary">Clear</button>
+                            <button type="button" id="btnExcludeAll" class="btn btn-outline-secondary">Exclude all</button>
+                        </div>
+                    </div>
+
+                    <ul id="itemsList" class="list-group list-group-flush d-none"
+                        style="max-height: 300px; overflow-y: auto;"></ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                    <button type="submit" class="btn btn-primary">Approve</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const excludeModal   = new bootstrap.Modal(document.getElementById("excludeModal"));
+            const form           = document.getElementById("excludeForm");
+            const requestIdInput = document.getElementById("excludeRequestId");
+            const listEl         = document.getElementById("itemsList");
+            const emptyEl        = document.getElementById("itemsEmpty");
+            const toolbarEl      = document.getElementById("itemsToolbar");
+            const btnAll         = document.getElementById("btnExcludeAll");
+            const btnNone        = document.getElementById("btnExcludeNone");
+
+            const show = (el) => el.classList.remove("d-none");
+            const hide = (el) => el.classList.add("d-none");
+
+            function clearChildren(el) {
+                while (el.firstChild) {
+                    el.removeChild(el.firstChild);
+                }
+            }
+
+            function buildRow(item) {
+                const id = `item_${item.id}`;
+
+                const li = document.createElement("label");
+                li.className = "list-group-item d-flex align-items-center justify-content-between gap-3";
+                li.setAttribute("for", id);
+
+                const titleWrap = document.createElement("div");
+                titleWrap.className = "flex-grow-1 text-truncate";
+                titleWrap.title = item.title ?? `Item ${item.id}`;
+                titleWrap.textContent = item.title ?? `Item ${item.id}`;
+
+                const switchWrap = document.createElement("div");
+                switchWrap.className = "form-check form-switch m-0";
+
+                const input = document.createElement("input");
+                input.type = "checkbox";
+                input.className = "form-check-input";
+                input.id = id;
+                input.name = "ExcludedItemIds";
+                input.value = item.id;
+
+                switchWrap.appendChild(input);
+                li.appendChild(titleWrap);
+                li.appendChild(switchWrap);
+                return li;
+            }
+
+            function getAllInputs() {
+                return Array.from(listEl.querySelectorAll('input[name="ExcludedItemIds"]'));
+            }
+
+            btnAll.addEventListener("click", () => {
+                getAllInputs().forEach(i => i.checked = true);
+            });
+
+            btnNone.addEventListener("click", () => {
+                getAllInputs().forEach(i => i.checked = false);
+            });
+
+            document.querySelectorAll(".btn-exclude").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const requestId = btn.dataset.requestId;
+                    const category  = btn.dataset.category;
+
+                    requestIdInput.value = requestId;
+                    form.action = `/AccessRequests/Accept/${requestId}`;
+
+                    clearChildren(listEl);
+                    hide(emptyEl);
+                    hide(listEl);
+                    hide(toolbarEl);
+
+                    try {
+                        const resp = await fetch(`/AccessRequests/GetItems?category=${encodeURIComponent(category)}`);
+                        if (!resp.ok) throw new Error(`Request failed: ${resp.status} ${resp.statusText}`);
+
+                        const items = await resp.json();
+
+                        if (!Array.isArray(items) || items.length === 0) {
+                            show(emptyEl);
+                            excludeModal.show();
+                            return;
+                        }
+
+                        for (const item of items) {
+                            listEl.appendChild(buildRow(item));
+                        }
+
+                        show(toolbarEl);
+                        show(listEl);
+                        excludeModal.show();
+                    } catch (e) {
+                        clearChildren(emptyEl);
+                        emptyEl.appendChild(document.createTextNode(e?.message || "Something went wrong."));
+                        show(emptyEl);
+                        excludeModal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+
