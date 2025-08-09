@@ -1,0 +1,118 @@
+@model NewAccessModel
+@{
+    ViewData["Title"] = "Request access";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h4 mb-1">Request access</h1>
+            <p class="text-muted mb-0">
+                Select one or more categories to request from this user.
+            </p>
+        </div>
+    </div>
+
+    @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+
+    <form action="/RequestAccess/NewRequest" method="post" class="d-flex flex-column gap-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TargetUserId" value="@Model.TargetUserId" />
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h2 class="h6 mb-0">Categories</h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small">Selected: <span id="selectedCount">0</span></span>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Bulk select">
+                            <button type="button" class="btn btn-outline-secondary" id="btnSelectAll">Select all</button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnClear">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted small mb-3">
+                    Checking a category will request access to all items in that category. The user can exclude specific items when reviewing requests.
+                </p>
+
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <div class="col">
+                            <label class="category-tile w-100 h-100 d-flex align-items-center p-3 border rounded shadow-sm">
+                                <input class="form-check-input me-2 cat-checkbox d-none"
+                                       type="checkbox"
+                                       id="cat_@cat" name="SelectedCategories" value="@cat" />
+                                <span class="flex-grow-1">@cat</span>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="/RequestAccess/List" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" id="btnSubmit" class="btn btn-primary" disabled>Request access</button>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const checkboxes = Array.from(document.querySelectorAll('.cat-checkbox'));
+            const tiles = document.querySelectorAll('.category-tile');
+            const countEl = document.getElementById('selectedCount');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const btnSelectAll = document.getElementById('btnSelectAll');
+            const btnClear = document.getElementById('btnClear');
+
+            function updateState() {
+                const selected = checkboxes.filter(c => c.checked).length;
+                countEl.textContent = selected;
+                btnSubmit.disabled = selected === 0;
+
+                tiles.forEach(tile => {
+                    const cb = tile.querySelector('.cat-checkbox');
+                    if (cb.checked) {
+                        tile.classList.add('active');
+                    } else {
+                        tile.classList.remove('active');
+                    }
+                });
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateState));
+
+            btnSelectAll.addEventListener('click', () => {
+                checkboxes.forEach(c => c.checked = true);
+                updateState();
+            });
+
+            btnClear.addEventListener('click', () => {
+                checkboxes.forEach(c => c.checked = false);
+                updateState();
+            });
+
+            updateState();
+        })();
+    </script>
+}
+
+<style>
+    .category-tile {
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        user-select: none;
+    }
+    .category-tile:hover {
+        background-color: #f8f9fa;
+    }
+    .category-tile.active {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        font-weight: 500;
+    }
+</style>
