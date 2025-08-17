@@ -1,0 +1,99 @@
+@model PagedResult<AccessGrantDto>
+@{
+    ViewData["Title"] = "Access Grants";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h4 mb-1">Access Grants</h1>
+            <p class="text-muted mb-0">Review access you’ve granted to others. You can revoke active grants at any time.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            @await Html.PartialAsync("_PageSizeSelector", new PagerModel {
+                BasePath = "/AccessGrants/List",
+                PageSize = Model.PageSize,
+                ItemsLabel = "Items",
+            })
+        </div>
+    </div>
+
+    @if (Model.Items is { Count: > 0 })
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th hidden>Id</th>
+                    <th>Requester Id</th>
+                    <th>Requester Email</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Granted at</th>
+                    <th>Revoked at</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var g in Model.Items)
+                {
+                    var isRevoked = g.RevokedAt.HasValue;
+                    <tr>
+                        <td hidden>@g.Id</td>
+                        <td class="text-muted small">@g.RequesterUserId</td>
+                        <td>@g.RequesterEmail</td>
+                        <td><span class="badge bg-secondary">@g.Category</span></td>
+                        <td>
+                            @if (!isRevoked)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Revoked</span>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            @g.GrantedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                        </td>
+                        <td class="text-nowrap">
+                            @(isRevoked ? g.RevokedAt!.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "-")
+                        </td>
+                        <td class="text-end">
+                            @if (!isRevoked)
+                            {
+                                <form action="/AccessGrants/Revoke/@g.Id" method="post" onsubmit="return confirm('Revoke this access grant?');" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Revoke</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No actions</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-3">
+            @await Html.PartialAsync("_Pager", new PagerModel {
+                BasePath = "/AccessGrants/List",
+                PageNumber = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalCount = Model.TotalCount
+            })
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5 mb-2">No access grants yet</h2>
+                <p class="text-muted mb-0">When you approve a request, it will appear here and you’ll be able to revoke it later.</p>
+            </div>
+        </div>
+    }
+</section>
