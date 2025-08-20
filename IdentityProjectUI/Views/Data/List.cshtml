@@ -1,0 +1,269 @@
+@model PagedResult<UserDto>
+@{
+    ViewData["Title"] = "Users who have granted access to their data";
+
+    var totalPages = Model.PageSize > 0
+        ? (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+        : 1;
+    var currentPage = Math.Max(1, Model.PageNumber);
+    var pageSize = Math.Max(1, Model.PageSize);
+
+    var currentSearch = (string?)Context.Request.Query["search"] ?? string.Empty;
+
+    string Query(int page, int size)
+        => $"/Data/List?pageNumber={page}&pageSize={size}{(string.IsNullOrWhiteSpace(currentSearch) ? "" : $"&search={Uri.EscapeDataString(currentSearch)}")}";
+}
+
+<section class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+            <h1 class="h4 mb-1">Users who have granted access</h1>
+            <p class="text-muted mb-0">Open a user to view categories you can access.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <form method="get" action="/Data/List" class="d-flex align-items-center">
+                <input type="hidden" name="pageNumber" value="1" />
+                @if (!string.IsNullOrWhiteSpace(currentSearch))
+                {
+                    <input type="hidden" name="search" value="@currentSearch" />
+                }
+                <label class="me-2 text-muted small">Items</label>
+                <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+                    @{
+                        int[] sizes = new[] { 5, 10, 20, 50 };
+                        foreach (var s in sizes)
+                        {
+                            <option value="@s" selected="@(s == pageSize ? "selected" : null)">@s</option>
+                        }
+                    }
+                </select>
+            </form>
+
+            <form method="get" action="/Data/List" class="d-flex align-items-center">
+                <input type="hidden" name="pageNumber" value="1" />
+                <input type="hidden" name="pageSize" value="@pageSize" />
+                <div class="input-group input-group-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Search by name or email"
+                           value="@currentSearch" />
+                    <button type="submit" class="btn btn-dark">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Items is { Count: > 0 })
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th class="text-muted small">Id</th>
+                    <th>User name</th>
+                    <th>Email</th>
+                    <th class="text-end">View data</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model.Items)
+                {
+                    <tr>
+                        <td class="text-muted small">@user.Id</td>
+                        <td>@user.Username</td>
+                        <td>@user.Email</td>
+                        <td class="text-end">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary btn-data"
+                                    data-user-id="@user.Id"
+                                    data-username="@user.Username">
+                                View data
+                            </button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-3">
+            
+            @if (totalPages > 1)
+            {
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : null)">
+                            <a class="page-link" href="@(currentPage == 1 ? "#" : Query(currentPage - 1, pageSize))">Previous</a>
+                        </li>
+
+                        @{
+                            int maxButtons = 7;
+                            int start = Math.Max(1, currentPage - 3);
+                            int end = Math.Min(totalPages, start + maxButtons - 1);
+                            start = Math.Max(1, Math.Min(start, end - maxButtons + 1));
+
+                            if (start > 1)
+                            {
+                                <li class="page-item"><a class="page-link" href="@Query(1, pageSize)">1</a></li>
+                                if (start > 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                }
+                            }
+
+                            for (int i = start; i <= end; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : null)">
+                                    <a class="page-link" href="@Query(i, pageSize)">@i</a>
+                                </li>
+                            }
+
+                            if (end < totalPages)
+                            {
+                                if (end < totalPages - 1)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                }
+                                <li class="page-item"><a class="page-link" href="@Query(totalPages, pageSize)">@totalPages</a></li>
+                            }
+                        }
+
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : null)">
+                            <a class="page-link" href="@(currentPage == totalPages ? "#" : Query(currentPage + 1, pageSize))">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5 mb-2">No users available</h2>
+                @if (!string.IsNullOrWhiteSpace(currentSearch))
+                {
+                    <p class="text-muted mb-4">No results for “@currentSearch”. Try a different query or clear the search.</p>
+                    <a class="btn btn-outline-secondary" href="/Data/List?pageNumber=1&pageSize=@pageSize">Clear search</a>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">When someone grants you access, they will appear here.</p>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+<div class="modal fade" id="dataModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="dataModalTitle" class="modal-title">Granted categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="dataLoading" class="text-muted">Loading…</div>
+                <div id="dataError" class="alert alert-danger d-none"></div>
+                <div id="dataEmpty" class="text-muted d-none">No active category grants.</div>
+
+                <table id="dataTable" class="table table-sm align-middle mb-0 d-none">
+                    <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Granted at</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="dataContainer"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const dataModal      = new bootstrap.Modal(document.getElementById("dataModal"));
+            const titleEl        = document.getElementById("dataModalTitle");
+            const itemsContainer = document.getElementById("dataContainer");
+            const tbl            = document.getElementById("dataTable");
+            const loadingEl      = document.getElementById("dataLoading");
+            const emptyEl        = document.getElementById("dataEmpty");
+            const errEl          = document.getElementById("dataError");
+
+            const show = (el) => el.classList.remove("d-none");
+            const hide = (el) => el.classList.add("d-none");
+            const fmtDateTime = (iso) => {
+                const d = new Date(iso);
+                return isNaN(d) ? "-" : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+            };
+
+            document.querySelectorAll(".btn-data").forEach(btn => {
+                btn.addEventListener("click", async () => {
+                    const userId   = btn.dataset.userId;
+                    const username = btn.dataset.username || "";
+//TODO: FIX innerHTML
+                    titleEl.textContent = username ? `Granted categories from ${username}` : "Granted categories";
+                    itemsContainer.innerHTML = "";
+                    hide(errEl); hide(emptyEl); hide(tbl); show(loadingEl);
+
+                    try {
+                        const resp = await fetch(`/AccessGrants/GetCategoriesById?userId=${encodeURIComponent(userId)}`, {
+                            method: "GET",
+                            headers: { "Accept": "application/json" },
+                            credentials: "same-origin"
+                        });
+                        if (!resp.ok) throw new Error(`Request failed: ${resp.status} ${resp.statusText}`);
+
+                        const items = await resp.json();
+
+                        if (!Array.isArray(items) || items.length === 0) {
+                            hide(loadingEl); show(emptyEl);
+                            dataModal.show();
+                            return;
+                        }
+
+                        for (const item of items) {
+                            const tr = document.createElement("tr");
+
+                            const tdCat = document.createElement("td");
+                            tdCat.textContent = item.categoryName ?? "-";
+
+                            const tdGranted = document.createElement("td");
+                            tdGranted.textContent = fmtDateTime(item.grantedAt);
+
+                            const tdAction = document.createElement("td");
+                            tdAction.className = "text-end";
+
+                            const viewUrl = `/Data/ViewAvailable?userId=${encodeURIComponent(userId)}&category=${encodeURIComponent(item.categoryName)}`;
+                            const a = document.createElement("a");
+                            a.href = viewUrl;
+                            a.className = "btn btn-primary btn-sm";
+                            a.textContent = "Open";
+
+                            tdAction.appendChild(a);
+
+                            tr.appendChild(tdCat);
+                            tr.appendChild(tdGranted);
+                            tr.appendChild(tdAction);
+
+                            itemsContainer.appendChild(tr);
+                        }
+
+                        hide(loadingEl); show(tbl);
+                        dataModal.show();
+                    } catch (e) {
+                        hide(loadingEl);
+                        errEl.textContent = e?.message || "Something went wrong.";
+                        show(errEl);
+                        dataModal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}
