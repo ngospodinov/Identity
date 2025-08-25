@@ -1,0 +1,26 @@
+@model IdentityProjectUI.Models.PagerModel
+@{
+    string sizeFormAction = Model.BasePath;
+}
+
+<form method="get" action="@sizeFormAction" class="d-flex align-items-center">
+    <input type="hidden" name="pageNumber" value="1" />
+    @if (!string.IsNullOrWhiteSpace(Model.ExtraQuery))
+    {
+        foreach (var pair in Model.ExtraQuery.Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = pair.Split('=', 2);
+            if (kv.Length == 2)
+            {
+                <input type="hidden" name="@kv[0]" value="@kv[1]" />
+            }
+        }
+    }
+    <label class="me-2 text-muted small">@Model.ItemsLabel</label>
+    <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+        @foreach (var s in Model.PageSizes)
+        {
+            <option value="@s" selected="@(s == Model.PageSize ? "selected" : null)">@s</option>
+        }
+    </select>
+</form>

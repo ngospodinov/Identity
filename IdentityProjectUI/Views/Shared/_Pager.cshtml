@@ -1,0 +1,74 @@
+@model IdentityProjectUI.Models.PagerModel
+@{
+    var totalPages = Model.PageSize > 0
+        ? (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+        : 1;
+    var currentPage = Math.Max(1, Model.PageNumber);
+    var pageSize = Math.Max(1, Model.PageSize);
+
+    string Query(int page, int size)
+    {
+        var core = $"pageNumber={page}&pageSize={size}";
+        if (!string.IsNullOrWhiteSpace(Model.ExtraQuery))
+            core += "&" + Model.ExtraQuery;
+        return $"{Model.BasePath}?{core}";
+    }
+}
+
+<div class="d-flex align-items-center justify-content-between mt-3">
+    
+    @if (totalPages > 1)
+    {
+        <nav aria-label="pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage == 1 ? "disabled" : null)">
+                    <a class="page-link"
+                       href="@(currentPage == 1 ? "#" : Query(currentPage - 1, pageSize))"
+                       rel="prev"
+                       aria-label="Previous page">Previous</a>
+                </li>
+
+                @{
+                    var maxButtons = 7;
+                    var start = Math.Max(1, currentPage - 3);
+                    var end = Math.Min(totalPages, start + maxButtons - 1);
+                    start = Math.Max(1, Math.Min(start, end - maxButtons + 1));
+
+                    if (start > 1)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Query(1, pageSize)">1</a></li>
+                        if (start > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                    }
+
+                    for (var i = start; i <= end; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : null)">
+                            <a class="page-link" href="@Query(i, pageSize)" aria-current="@(i==currentPage ? "page" : null)">@i</a>
+                        </li>
+                    }
+
+                    if (end < totalPages)
+                    {
+                        if (end < totalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        }
+                        <li class="page-item"><a class="page-link" href="@Query(totalPages, pageSize)">@totalPages</a></li>
+                    }
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : null)">
+                    <a class="page-link"
+                       href="@(currentPage == totalPages ? "#" : Query(currentPage + 1, pageSize))"
+                       rel="next"
+                       aria-label="Next page">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+

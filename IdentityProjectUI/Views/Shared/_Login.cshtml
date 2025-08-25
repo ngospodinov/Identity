@@ -1,0 +1,24 @@
+@inject IConfiguration Config
+@{
+    var name = User.Identity?.Name ?? User.FindFirst("email")?.Value;
+    var idpBase  = Config["IdentityProvider:BaseUrl"];
+    var manageUrl = $"{idpBase}{Config["IdentityProvider:ManagePath"]}";
+}
+
+<ul class="navbar-nav">
+    @if (!User.Identity!.IsAuthenticated)
+    {
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item d-flex align-items-center">
+            <a class="nav-link" href="@manageUrl" title="Manage account">@name</a>
+        </li>
+    <li class="nav-item">
+        <a class="nav-link text-danger" href="/logout">Logout</a>
+    </li>
+    }
+</ul>
